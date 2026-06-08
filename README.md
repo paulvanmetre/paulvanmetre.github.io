@@ -1,3 +1,3 @@
 # paulvanmetre.github.io
 Paul's stuff
-Some Kimbo stuff too
+Some ProShop stuff too
