@@ -841,27 +841,28 @@ function buildPrompt(fromKey, toKey, toKeyAbc) {
 Analyze this sheet music image and perform the following tasks:
 
 1. ${fromInstruction}
-2. Transcribe ALL notes, rhythms, bar lines, repeats, dynamics, and other musical markings from the image into ABC notation.
+2. Transcribe ALL notes, rhythms, bar lines, repeats, and other markings into ABC notation.
 3. Transpose the entire piece to ${toKey} (ABC key: ${toKeyAbc}).
-4. Return your response as valid JSON with this exact structure:
 
-{
-  "detected_key": "the key you identified (e.g. 'G major')",
-  "title": "the title of the piece if visible, or 'Unknown'",
-  "measures_count": <number of measures you transcribed>,
-  "abc_notation": "the complete transposed ABC notation string here"
-}
+Return your response in EXACTLY this format — no extra text, no markdown, no code fences:
 
-ABC notation format rules:
-- Start with X:1 on its own line
-- Include T: (title), M: (time signature), L: (default note length), Q: (tempo if known), K: (the TARGET key ${toKeyAbc})
-- Separate measures with | and end lines with |
-- Use standard ABC pitch notation (uppercase = below middle octave, lowercase = above)
-- Include chord symbols with "..." if visible
-- Include bar lines, double bars, repeat signs
-- Be thorough — transcribe every measure you can see
+DETECTED_KEY: <the key you identified, e.g. G major>
+TITLE: <the title if visible, or Unknown>
+MEASURES: <number of measures>
+ABC_START
+X:1
+T:<title>
+M:<time signature>
+L:<default note length, e.g. 1/8>
+K:${toKeyAbc}
+<the complete transposed music in ABC notation>
+ABC_END
 
-IMPORTANT: Return ONLY valid JSON, no markdown code fences, no explanation text.`;
+ABC notation rules:
+- Use standard ABC pitch letters (C D E F G A B, lowercase for higher octave)
+- Separate measures with |
+- End lines with a newline inside ABC_START...ABC_END
+- Include repeat signs if present`;
 }
 
 // ─── API calls ────────────────────────────────────────────────────────────────
@@ -923,14 +924,22 @@ async function callClaude(apiKey, prompt) {
 }
 
 function parseResponse(raw) {
-  let cleaned = raw.trim().replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
-  try {
-    return JSON.parse(cleaned);
-  } catch {
-    const match = cleaned.match(/\{[\s\S]*\}/);
-    if (match) return JSON.parse(match[0]);
-    throw new Error('Could not parse AI response as JSON. Try again with a clearer image.');
+  const abcMatch = raw.match(/ABC_START\s*([\s\S]*?)\s*ABC_END/);
+  if (!abcMatch) {
+    // Fallback: try JSON in case an older prompt cached
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try { return JSON.parse(jsonMatch[0]); } catch {}
+    }
+    throw new Error('The AI returned an unexpected format. Please try again.');
   }
+
+  const abc = abcMatch[1].trim();
+  const detectedKey = (raw.match(/DETECTED_KEY:\s*(.+)/) || [])[1]?.trim() || '';
+  const title       = (raw.match(/TITLE:\s*(.+)/)        || [])[1]?.trim() || 'Unknown';
+  const measures    = parseInt((raw.match(/MEASURES:\s*(\d+)/) || [])[1] || '0');
+
+  return { detected_key: detectedKey, title, measures_count: measures, abc_notation: abc };
 }
 
 // ─── Transpose ────────────────────────────────────────────────────────────────
