@@ -493,9 +493,20 @@
       <label id="key-label" for="api-key">Gemini API Key</label>
       <input type="password" id="api-key" placeholder="AIzaSy..." autocomplete="off" spellcheck="false" />
     </div>
+    <div class="field" id="gemini-model-field" style="margin-top:12px">
+      <label for="gemini-model">Gemini Model</label>
+      <select id="gemini-model">
+        <option value="gemini-2.5-flash">gemini-2.5-flash (newest)</option>
+        <option value="gemini-2.0-flash" selected>gemini-2.0-flash</option>
+        <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite</option>
+        <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+        <option value="gemini-1.5-flash-8b">gemini-1.5-flash-8b</option>
+      </select>
+    </div>
     <p class="hint" id="key-hint">
-      Free tier — no credit card needed. Get a key in &lt;2 minutes at
-      <a id="key-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>.
+      Get a free key at <a id="key-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>.
+      If you see a quota error, try enabling billing on your Google Cloud project
+      (<a href="https://console.cloud.google.com/billing" target="_blank" rel="noopener">console.cloud.google.com/billing</a>) — the free tier still won't charge you.
       Your key stays in this browser tab only.
     </p>
     <div class="alert alert-error" id="api-key-error"></div>
@@ -687,20 +698,17 @@ function selectProvider(p) {
   document.getElementById('btn-gemini').classList.toggle('active', p === 'gemini');
   document.getElementById('btn-claude').classList.toggle('active', p === 'claude');
 
+  const modelField = document.getElementById('gemini-model-field');
   if (p === 'gemini') {
     keyLabel.textContent = 'Gemini API Key';
     apiKeyInput.placeholder = 'AIzaSy…';
-    keyHint.innerHTML = 'Free tier — no credit card needed. Get a key in &lt;2 minutes at '
-      + '<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>. '
-      + 'Your key stays in this browser tab only.';
+    if (modelField) modelField.style.display = '';
     const saved = sessionStorage.getItem('gemini_key') || '';
     apiKeyInput.value = saved;
   } else {
     keyLabel.textContent = 'Anthropic API Key';
     apiKeyInput.placeholder = 'sk-ant-…';
-    keyHint.innerHTML = 'Requires a paid account. Get a key at '
-      + '<a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>. '
-      + 'Your key stays in this browser tab only.';
+    if (modelField) modelField.style.display = 'none';
     const saved = sessionStorage.getItem('claude_key') || '';
     apiKeyInput.value = saved;
   }
@@ -858,7 +866,8 @@ IMPORTANT: Return ONLY valid JSON, no markdown code fences, no explanation text.
 
 // ─── API calls ────────────────────────────────────────────────────────────────
 async function callGemini(apiKey, prompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const model = document.getElementById('gemini-model')?.value || 'gemini-2.0-flash';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
