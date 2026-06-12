@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sheet Music Transposer</title>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.3/dist/abcjs-basic-min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #23263a;
+      --border: #2e3150;
+      --accent: #6c63ff;
+      --accent2: #a78bfa;
+      --text: #e8eaf6;
+      --muted: #7c82a8;
+      --success: #4ade80;
+      --error: #f87171;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #23263a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    header .logo {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent2), #c4b5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--accent2);
+    }
+
+    .step-badge {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* API Key */
+    .api-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .field {
+      flex: 1;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .field input, .field select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus, .field select:focus {
+      border-color: var(--accent);
+    }
+
+    .field select option {
+      background: var(--surface2);
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .hint a { color: var(--accent2); text-decoration: none; }
+    .hint a:hover { text-decoration: underline; }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      background: var(--surface2);
+    }
+
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, 0.07);
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-zone .icon { font-size: 40px; margin-bottom: 10px; }
+    .upload-zone .text { font-size: 0.95rem; color: var(--text); }
+    .upload-zone .sub { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-primary:hover:not(:disabled) { background: #5a52e0; }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover:not(:disabled) { border-color: var(--accent); color: var(--accent2); }
+
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* Camera button */
+    .camera-btn {
+      margin-top: 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .camera-btn:hover { border-color: var(--accent); color: var(--accent2); }
+
+    /* Preview */
+    #preview-container {
+      margin-top: 16px;
+      display: none;
+      position: relative;
+    }
+
+    #preview-container img {
+      max-width: 100%;
+      max-height: 400px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+
+    .clear-img {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.7);
+      border: none;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .clear-img:hover { background: rgba(248,113,113,0.8); }
+
+    /* Key row */
+    .key-row {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr;
+      gap: 16px;
+      align-items: end;
+    }
+
+    .arrow-divider {
+      text-align: center;
+      font-size: 1.4rem;
+      color: var(--accent2);
+      padding-bottom: 8px;
+    }
+
+    /* Transpose button */
+    .action-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    #transpose-btn {
+      padding: 12px 28px;
+      font-size: 1rem;
+    }
+
+    /* Status */
+    .status {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .status.visible { display: flex; }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error / info box */
+    .alert {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      margin-top: 12px;
+    }
+    .alert.visible { display: block; }
+    .alert-error { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+    .alert-info  { background: rgba(108,99,255,0.10); border: 1px solid rgba(108,99,255,0.3); color: var(--accent2); }
+
+    /* Results */
+    #results { display: none; }
+    #results.visible { display: block; }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .results-grid { grid-template-columns: 1fr; }
+      .key-row { grid-template-columns: 1fr 40px 1fr; }
+    }
+
+    .results-panel {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .results-panel-header {
+      padding: 12px 16px;
+      background: rgba(108,99,255,0.1);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .key-badge {
+      background: var(--accent);
+      color: white;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+    }
+
+    .results-panel-body {
+      padding: 16px;
+    }
+
+    #original-thumb {
+      max-width: 100%;
+      border-radius: 6px;
+    }
+
+    /* ABC notation output */
+    #abc-output {
+      background: white;
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 120px;
+      overflow-x: auto;
+    }
+
+    .abc-raw-container {
+      margin-top: 16px;
+    }
+
+    .abc-raw-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .abc-raw-header span { font-size: 0.8rem; color: var(--muted); }
+
+    #abc-raw {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 220px;
+      overflow-y: auto;
+      line-height: 1.6;
+    }
+
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent2); }
+
+    /* Detection info */
+    #detection-info {
+      display: none;
+      background: rgba(74,222,128,0.08);
+      border: 1px solid rgba(74,222,128,0.25);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      color: var(--success);
+      margin-top: 8px;
+    }
+    #detection-info.visible { display: block; }
+
+    /* Camera modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.visible { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      max-width: 500px;
+      width: 95%;
+    }
+
+    .modal h3 { margin-bottom: 16px; font-size: 1rem; color: var(--accent2); }
+
+    #camera-preview {
+      width: 100%;
+      border-radius: 8px;
+      background: black;
+      display: block;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      justify-content: flex-end;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🎵</div>
+  <div>
+    <h1>Sheet Music Transposer</h1>
+    <p>Upload a photo of sheet music and transpose it to any key</p>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- Step 1: API Key -->
+  <div class="card" id="card-api">
+    <div class="card-title">
+      <div class="step-badge">1</div>
+      Anthropic API Key
+    </div>
+    <div class="api-row">
+      <div class="field">
+        <label for="api-key">API Key</label>
+        <input type="password" id="api-key" placeholder="sk-ant-..." autocomplete="off" spellcheck="false" />
+      </div>
+    </div>
+    <p class="hint">
+      Your key is used only in this browser session and never stored on any server.
+      Get one at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>.
+    </p>
+    <div class="alert alert-error" id="api-key-error"></div>
+  </div>
+
+  <!-- Step 2: Upload -->
+  <div class="card" id="card-upload">
+    <div class="card-title">
+      <div class="step-badge">2</div>
+      Upload Sheet Music
+    </div>
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" id="file-input" accept="image/*" />
+      <div class="icon">📄</div>
+      <div class="text">Drag & drop or click to upload</div>
+      <div class="sub">JPG, PNG, WebP, GIF supported</div>
+    </div>
+    <div style="text-align:center">
+      <button class="camera-btn" id="camera-btn">📷 Use Camera</button>
+    </div>
+    <div id="preview-container">
+      <img id="preview-img" src="" alt="Sheet music preview" />
+      <button class="clear-img" id="clear-img" title="Remove image">✕</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Transposition -->
+  <div class="card" id="card-keys">
+    <div class="card-title">
+      <div class="step-badge">3</div>
+      Transposition
+    </div>
+    <div class="key-row">
+      <div class="field">
+        <label for="from-key">From Key (leave "Auto-detect" to let AI identify)</label>
+        <select id="from-key">
+          <option value="auto">Auto-detect from image</option>
+          <optgroup label="Major Keys">
+            <option>C major</option>
+            <option>G major</option>
+            <option>D major</option>
+            <option>A major</option>
+            <option>E major</option>
+            <option>B major</option>
+            <option>F# major</option>
+            <option>C# major</option>
+            <option>F major</option>
+            <option>Bb major</option>
+            <option>Eb major</option>
+            <option>Ab major</option>
+            <option>Db major</option>
+            <option>Gb major</option>
+            <option>Cb major</option>
+          </optgroup>
+          <optgroup label="Minor Keys">
+            <option>A minor</option>
+            <option>E minor</option>
+            <option>B minor</option>
+            <option>F# minor</option>
+            <option>C# minor</option>
+            <option>G# minor</option>
+            <option>D# minor</option>
+            <option>A# minor</option>
+            <option>D minor</option>
+            <option>G minor</option>
+            <option>C minor</option>
+            <option>F minor</option>
+            <option>Bb minor</option>
+            <option>Eb minor</option>
+            <option>Ab minor</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="arrow-divider">→</div>
+      <div class="field">
+        <label for="to-key">To Key</label>
+        <select id="to-key">
+          <optgroup label="Major Keys">
+            <option>C major</option>
+            <option>G major</option>
+            <option>D major</option>
+            <option>A major</option>
+            <option>E major</option>
+            <option>B major</option>
+            <option>F# major</option>
+            <option>C# major</option>
+            <option>F major</option>
+            <option>Bb major</option>
+            <option>Eb major</option>
+            <option>Ab major</option>
+            <option>Db major</option>
+            <option>Gb major</option>
+            <option>Cb major</option>
+          </optgroup>
+          <optgroup label="Minor Keys">
+            <option>A minor</option>
+            <option>E minor</option>
+            <option>B minor</option>
+            <option>F# minor</option>
+            <option>C# minor</option>
+            <option>G# minor</option>
+            <option>D# minor</option>
+            <option>A# minor</option>
+            <option>D minor</option>
+            <option>G minor</option>
+            <option>C minor</option>
+            <option>F minor</option>
+            <option>Bb minor</option>
+            <option>Eb minor</option>
+            <option>Ab minor</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Transpose -->
+  <div class="card">
+    <div class="action-row">
+      <button class="btn btn-primary" id="transpose-btn" disabled>
+        <span>✨</span> Transpose
+      </button>
+      <div class="status" id="status">
+        <div class="spinner"></div>
+        <span id="status-text">Analyzing sheet music…</span>
+      </div>
+    </div>
+    <div class="alert alert-error" id="transpose-error"></div>
+  </div>
+
+  <!-- Results -->
+  <div class="card" id="results">
+    <div class="card-title">
+      <div class="step-badge">✓</div>
+      Results
+    </div>
+
+    <div id="detection-info"></div>
+
+    <div class="results-grid" style="margin-top:16px">
+      <div class="results-panel">
+        <div class="results-panel-header">
+          <span>Original</span>
+          <span class="key-badge" id="original-key-badge">–</span>
+        </div>
+        <div class="results-panel-body">
+          <img id="original-thumb" src="" alt="Original sheet music" />
+        </div>
+      </div>
+      <div class="results-panel">
+        <div class="results-panel-header">
+          <span>Transposed</span>
+          <span class="key-badge" id="transposed-key-badge">–</span>
+        </div>
+        <div class="results-panel-body">
+          <div id="abc-output"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="abc-raw-container">
+      <div class="abc-raw-header">
+        <span>ABC Notation</span>
+        <button class="copy-btn" id="copy-btn">Copy</button>
+      </div>
+      <pre id="abc-raw"></pre>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- Camera Modal -->
+<div class="modal-overlay" id="camera-modal">
+  <div class="modal">
+    <h3>📷 Camera Capture</h3>
+    <video id="camera-preview" autoplay playsinline></video>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="camera-cancel">Cancel</button>
+      <button class="btn btn-primary" id="camera-capture">📸 Capture</button>
+    </div>
+  </div>
+</div>
+
+<canvas id="capture-canvas" style="display:none"></canvas>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let imageBase64 = null;
+let imageMimeType = 'image/jpeg';
+let cameraStream = null;
+
+// ─── DOM refs ────────────────────────────────────────────────────────────────
+const apiKeyInput    = document.getElementById('api-key');
+const apiKeyError    = document.getElementById('api-key-error');
+const uploadZone     = document.getElementById('upload-zone');
+const fileInput      = document.getElementById('file-input');
+const previewContainer = document.getElementById('preview-container');
+const previewImg     = document.getElementById('preview-img');
+const clearImgBtn    = document.getElementById('clear-img');
+const cameraBtn      = document.getElementById('camera-btn');
+const cameraModal    = document.getElementById('camera-modal');
+const cameraPreview  = document.getElementById('camera-preview');
+const cameraCancel   = document.getElementById('camera-cancel');
+const cameraCaptureBtn = document.getElementById('camera-capture');
+const captureCanvas  = document.getElementById('capture-canvas');
+const fromKeySelect  = document.getElementById('from-key');
+const toKeySelect    = document.getElementById('to-key');
+const transposeBtn   = document.getElementById('transpose-btn');
+const statusEl       = document.getElementById('status');
+const statusText     = document.getElementById('status-text');
+const transposeError = document.getElementById('transpose-error');
+const results        = document.getElementById('results');
+const detectionInfo  = document.getElementById('detection-info');
+const originalKeyBadge   = document.getElementById('original-key-badge');
+const transposedKeyBadge = document.getElementById('transposed-key-badge');
+const originalThumb  = document.getElementById('original-thumb');
+const abcOutput      = document.getElementById('abc-output');
+const abcRaw         = document.getElementById('abc-raw');
+const copyBtn        = document.getElementById('copy-btn');
+
+// ─── Image loading ────────────────────────────────────────────────────────────
+function setImage(base64, mimeType) {
+  imageBase64 = base64;
+  imageMimeType = mimeType;
+  previewImg.src = `data:${mimeType};base64,${base64}`;
+  previewContainer.style.display = 'block';
+  updateTransposeBtn();
+}
+
+function clearImage() {
+  imageBase64 = null;
+  previewContainer.style.display = 'none';
+  previewImg.src = '';
+  fileInput.value = '';
+  updateTransposeBtn();
+}
+
+function readFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    const [header, b64] = dataUrl.split(',');
+    const mime = header.match(/:(.*?);/)[1];
+    setImage(b64, mime);
+  };
+  reader.readAsDataURL(file);
+}
+
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) readFile(e.target.files[0]);
+});
+
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
+});
+
+clearImgBtn.addEventListener('click', clearImage);
+
+// ─── Camera ───────────────────────────────────────────────────────────────────
+cameraBtn.addEventListener('click', async () => {
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    cameraPreview.srcObject = cameraStream;
+    cameraModal.classList.add('visible');
+  } catch (err) {
+    alert('Camera access denied or unavailable: ' + err.message);
+  }
+});
+
+function stopCamera() {
+  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+  cameraModal.classList.remove('visible');
+}
+
+cameraCancel.addEventListener('click', stopCamera);
+
+cameraCaptureBtn.addEventListener('click', () => {
+  const w = cameraPreview.videoWidth;
+  const h = cameraPreview.videoHeight;
+  captureCanvas.width = w;
+  captureCanvas.height = h;
+  captureCanvas.getContext('2d').drawImage(cameraPreview, 0, 0, w, h);
+  const dataUrl = captureCanvas.toDataURL('image/jpeg', 0.92);
+  const b64 = dataUrl.split(',')[1];
+  setImage(b64, 'image/jpeg');
+  stopCamera();
+});
+
+// ─── Transpose button state ───────────────────────────────────────────────────
+function updateTransposeBtn() {
+  transposeBtn.disabled = !(imageBase64 && apiKeyInput.value.trim().startsWith('sk-ant-'));
+}
+apiKeyInput.addEventListener('input', updateTransposeBtn);
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function showError(el, msg) { el.textContent = msg; el.classList.add('visible'); }
+function hideError(el) { el.textContent = ''; el.classList.remove('visible'); }
+function setStatus(msg) { statusText.textContent = msg; statusEl.classList.add('visible'); }
+function hideStatus() { statusEl.classList.remove('visible'); }
+
+// Map friendly key names to ABC notation K: field values
+const keyToAbc = {
+  'C major': 'C', 'G major': 'G', 'D major': 'D', 'A major': 'A',
+  'E major': 'E', 'B major': 'B', 'F# major': 'F#', 'C# major': 'C#',
+  'F major': 'F', 'Bb major': 'Bb', 'Eb major': 'Eb', 'Ab major': 'Ab',
+  'Db major': 'Db', 'Gb major': 'Gb', 'Cb major': 'Cb',
+  'A minor': 'Am', 'E minor': 'Em', 'B minor': 'Bm', 'F# minor': 'F#m',
+  'C# minor': 'C#m', 'G# minor': 'G#m', 'D# minor': 'D#m', 'A# minor': 'A#m',
+  'D minor': 'Dm', 'G minor': 'Gm', 'C minor': 'Cm', 'F minor': 'Fm',
+  'Bb minor': 'Bbm', 'Eb minor': 'Ebm', 'Ab minor': 'Abm'
+};
+
+// ─── Transpose ────────────────────────────────────────────────────────────────
+transposeBtn.addEventListener('click', async () => {
+  hideError(transposeError);
+  hideError(apiKeyError);
+
+  const apiKey = apiKeyInput.value.trim();
+  if (!apiKey.startsWith('sk-ant-')) {
+    showError(apiKeyError, 'Please enter a valid Anthropic API key (starts with sk-ant-).');
+    return;
+  }
+  if (!imageBase64) { return; }
+
+  const fromKey = fromKeySelect.value;
+  const toKey   = toKeySelect.value;
+  const toKeyAbc = keyToAbc[toKey] || 'C';
+
+  const fromInstruction = fromKey === 'auto'
+    ? 'Identify the key signature from the sheet music.'
+    : `The source key is ${fromKey}.`;
+
+  const prompt = `You are an expert music transcriptionist with deep knowledge of music theory and ABC notation.
+
+Analyze this sheet music image and perform the following tasks:
+
+1. ${fromInstruction}
+2. Transcribe ALL notes, rhythms, bar lines, repeats, dynamics, and other musical markings from the image into ABC notation.
+3. Transpose the entire piece to ${toKey} (ABC key: ${toKeyAbc}).
+4. Return your response as valid JSON with this exact structure:
+
+{
+  "detected_key": "the key you identified (e.g. 'G major')",
+  "title": "the title of the piece if visible, or 'Unknown'",
+  "measures_count": <number of measures you transcribed>,
+  "abc_notation": "the complete transposed ABC notation string here"
+}
+
+ABC notation format rules:
+- Start with X:1 on its own line
+- Include T: (title), M: (time signature), L: (default note length), Q: (tempo if known), K: (the TARGET key ${toKeyAbc})
+- Separate measures with | and end lines with |
+- Use standard ABC pitch notation (uppercase = below middle octave, lowercase = above; ' for octave up, , for octave down)
+- Include chord symbols with "..." if visible
+- Include bar lines, double bars, repeat signs
+- Be thorough — transcribe every measure you can see
+
+IMPORTANT: Return ONLY valid JSON, no markdown code fences, no explanation text.`;
+
+  transposeBtn.disabled = true;
+  setStatus('Sending image to Claude API…');
+  results.classList.remove('visible');
+  detectionInfo.classList.remove('visible');
+
+  try {
+    setStatus('Analyzing sheet music and transposing…');
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 4096,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: {
+                type: 'base64',
+                media_type: imageMimeType,
+                data: imageBase64
+              }
+            },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      const msg = errData.error?.message || `HTTP ${response.status}`;
+      throw new Error(msg);
+    }
+
+    setStatus('Processing response…');
+    const data = await response.json();
+    const raw = data.content?.[0]?.text || '';
+
+    // Parse JSON — strip markdown fences if present
+    let cleaned = raw.trim().replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch {
+      // Try to extract JSON from the response
+      const match = cleaned.match(/\{[\s\S]*\}/);
+      if (match) { parsed = JSON.parse(match[0]); }
+      else { throw new Error('Could not parse AI response as JSON. The model may have returned an unexpected format.'); }
+    }
+
+    const abcStr = parsed.abc_notation || '';
+    if (!abcStr.trim()) { throw new Error('The AI did not return any ABC notation. Try with a clearer image.'); }
+
+    // Show detection info
+    if (parsed.detected_key) {
+      detectionInfo.textContent = `Detected: ${parsed.detected_key}${parsed.title && parsed.title !== 'Unknown' ? ' · "' + parsed.title + '"' : ''}${parsed.measures_count ? ' · ' + parsed.measures_count + ' measures' : ''}`;
+      detectionInfo.classList.add('visible');
+    }
+
+    // Render
+    originalKeyBadge.textContent   = parsed.detected_key || (fromKey === 'auto' ? '?' : fromKey);
+    transposedKeyBadge.textContent  = toKey;
+    originalThumb.src = `data:${imageMimeType};base64,${imageBase64}`;
+    abcRaw.textContent = abcStr;
+
+    // Render ABC notation
+    abcOutput.innerHTML = '';
+    try {
+      ABCJS.renderAbc(abcOutput, abcStr, {
+        responsive: 'resize',
+        staffwidth: 400,
+        scale: 0.95,
+        paddingright: 0,
+        paddingtop: 10
+      });
+    } catch (renderErr) {
+      abcOutput.innerHTML = `<p style="color:#f87171;font-size:0.85rem">Render error: ${renderErr.message}<br><br>ABC text shown below.</p>`;
+    }
+
+    results.classList.add('visible');
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch (err) {
+    showError(transposeError, 'Error: ' + err.message);
+  } finally {
+    hideStatus();
+    transposeBtn.disabled = false;
+    updateTransposeBtn();
+  }
+});
+
+// ─── Copy button ──────────────────────────────────────────────────────────────
+copyBtn.addEventListener('click', async () => {
+  const text = abcRaw.textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    copyBtn.textContent = 'Copied!';
+    setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
+  } catch {
+    copyBtn.textContent = 'Failed';
+    setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
+  }
+});
+
+// ─── Restore API key from sessionStorage ─────────────────────────────────────
+const savedKey = sessionStorage.getItem('anthropic_key');
+if (savedKey) { apiKeyInput.value = savedKey; updateTransposeBtn(); }
+apiKeyInput.addEventListener('input', () => {
+  if (apiKeyInput.value.startsWith('sk-ant-')) {
+    sessionStorage.setItem('anthropic_key', apiKeyInput.value);
+  }
+});
+</script>
+</body>
+</html>
