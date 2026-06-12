@@ -22,6 +22,8 @@
       --radius: 12px;
     }
 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background: var(--bg);
@@ -39,10 +41,7 @@
       gap: 16px;
     }
 
-    header .logo {
-      font-size: 28px;
-      line-height: 1;
-    }
+    header .logo { font-size: 28px; line-height: 1; }
 
     header h1 {
       font-size: 1.5rem;
@@ -53,11 +52,7 @@
       background-clip: text;
     }
 
-    header p {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-top: 2px;
-    }
+    header p { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
 
     .main {
       max-width: 960px;
@@ -99,16 +94,48 @@
       flex-shrink: 0;
     }
 
-    /* API Key */
-    .api-row {
+    /* Provider toggle */
+    .provider-toggle {
       display: flex;
-      gap: 10px;
-      align-items: flex-end;
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
-    .field {
+    .provider-btn {
       flex: 1;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
+
+    .provider-btn.active {
+      border-color: var(--accent);
+      background: rgba(108,99,255,0.15);
+      color: var(--accent2);
+    }
+
+    .provider-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background: var(--success);
+      color: #0f1117;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .field { flex: 1; }
 
     .field label {
       display: block;
@@ -129,20 +156,10 @@
       transition: border-color 0.2s;
     }
 
-    .field input:focus, .field select:focus {
-      border-color: var(--accent);
-    }
+    .field input:focus, .field select:focus { border-color: var(--accent); }
+    .field select option { background: var(--surface2); }
 
-    .field select option {
-      background: var(--surface2);
-    }
-
-    .hint {
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
+    .hint { font-size: 0.75rem; color: var(--muted); margin-top: 6px; }
     .hint a { color: var(--accent2); text-decoration: none; }
     .hint a:hover { text-decoration: underline; }
 
@@ -188,10 +205,7 @@
       text-decoration: none;
     }
 
-    .btn-primary {
-      background: var(--accent);
-      color: white;
-    }
+    .btn-primary { background: var(--accent); color: white; }
     .btn-primary:hover:not(:disabled) { background: #5a52e0; }
 
     .btn-secondary {
@@ -203,7 +217,6 @@
 
     .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-    /* Camera button */
     .camera-btn {
       margin-top: 14px;
       background: var(--surface2);
@@ -220,7 +233,6 @@
     }
     .camera-btn:hover { border-color: var(--accent); color: var(--accent2); }
 
-    /* Preview */
     #preview-container {
       margin-top: 16px;
       display: none;
@@ -254,7 +266,6 @@
     }
     .clear-img:hover { background: rgba(248,113,113,0.8); }
 
-    /* Key row */
     .key-row {
       display: grid;
       grid-template-columns: 1fr 60px 1fr;
@@ -269,19 +280,14 @@
       padding-bottom: 8px;
     }
 
-    /* Transpose button */
     .action-row {
       display: flex;
       gap: 12px;
       align-items: center;
     }
 
-    #transpose-btn {
-      padding: 12px 28px;
-      font-size: 1rem;
-    }
+    #transpose-btn { padding: 12px 28px; font-size: 1rem; }
 
-    /* Status */
     .status {
       display: none;
       align-items: center;
@@ -302,7 +308,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Error / info box */
     .alert {
       display: none;
       padding: 12px 16px;
@@ -314,7 +319,6 @@
     .alert-error { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
     .alert-info  { background: rgba(108,99,255,0.10); border: 1px solid rgba(108,99,255,0.3); color: var(--accent2); }
 
-    /* Results */
     #results { display: none; }
     #results.visible { display: block; }
 
@@ -357,16 +361,10 @@
       font-size: 0.75rem;
     }
 
-    .results-panel-body {
-      padding: 16px;
-    }
+    .results-panel-body { padding: 16px; }
 
-    #original-thumb {
-      max-width: 100%;
-      border-radius: 6px;
-    }
+    #original-thumb { max-width: 100%; border-radius: 6px; }
 
-    /* ABC notation output */
     #abc-output {
       background: white;
       border-radius: 8px;
@@ -375,9 +373,7 @@
       overflow-x: auto;
     }
 
-    .abc-raw-container {
-      margin-top: 16px;
-    }
+    .abc-raw-container { margin-top: 16px; }
 
     .abc-raw-header {
       display: flex;
@@ -415,7 +411,6 @@
     }
     .copy-btn:hover { border-color: var(--accent); color: var(--accent2); }
 
-    /* Detection info */
     #detection-info {
       display: none;
       background: rgba(74,222,128,0.08);
@@ -428,7 +423,6 @@
     }
     #detection-info.visible { display: block; }
 
-    /* Camera modal */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -482,17 +476,27 @@
   <div class="card" id="card-api">
     <div class="card-title">
       <div class="step-badge">1</div>
-      Anthropic API Key
+      AI Provider &amp; API Key
     </div>
-    <div class="api-row">
-      <div class="field">
-        <label for="api-key">API Key</label>
-        <input type="password" id="api-key" placeholder="sk-ant-..." autocomplete="off" spellcheck="false" />
-      </div>
+
+    <div class="provider-toggle">
+      <button class="provider-btn active" id="btn-gemini" onclick="selectProvider('gemini')">
+        <span>Google Gemini</span>
+        <span class="provider-badge">Free</span>
+      </button>
+      <button class="provider-btn" id="btn-claude" onclick="selectProvider('claude')">
+        <span>Claude (Anthropic)</span>
+      </button>
     </div>
-    <p class="hint">
-      Your key is used only in this browser session and never stored on any server.
-      Get one at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>.
+
+    <div class="field">
+      <label id="key-label" for="api-key">Gemini API Key</label>
+      <input type="password" id="api-key" placeholder="AIzaSy..." autocomplete="off" spellcheck="false" />
+    </div>
+    <p class="hint" id="key-hint">
+      Free tier — no credit card needed. Get a key in &lt;2 minutes at
+      <a id="key-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>.
+      Your key stays in this browser tab only.
     </p>
     <div class="alert alert-error" id="api-key-error"></div>
   </div>
@@ -506,7 +510,7 @@
     <div class="upload-zone" id="upload-zone">
       <input type="file" id="file-input" accept="image/*" />
       <div class="icon">📄</div>
-      <div class="text">Drag & drop or click to upload</div>
+      <div class="text">Drag &amp; drop or click to upload</div>
       <div class="sub">JPG, PNG, WebP, GIF supported</div>
     </div>
     <div style="text-align:center">
@@ -530,38 +534,18 @@
         <select id="from-key">
           <option value="auto">Auto-detect from image</option>
           <optgroup label="Major Keys">
-            <option>C major</option>
-            <option>G major</option>
-            <option>D major</option>
-            <option>A major</option>
-            <option>E major</option>
-            <option>B major</option>
-            <option>F# major</option>
-            <option>C# major</option>
-            <option>F major</option>
-            <option>Bb major</option>
-            <option>Eb major</option>
-            <option>Ab major</option>
-            <option>Db major</option>
-            <option>Gb major</option>
-            <option>Cb major</option>
+            <option>C major</option><option>G major</option><option>D major</option>
+            <option>A major</option><option>E major</option><option>B major</option>
+            <option>F# major</option><option>C# major</option><option>F major</option>
+            <option>Bb major</option><option>Eb major</option><option>Ab major</option>
+            <option>Db major</option><option>Gb major</option><option>Cb major</option>
           </optgroup>
           <optgroup label="Minor Keys">
-            <option>A minor</option>
-            <option>E minor</option>
-            <option>B minor</option>
-            <option>F# minor</option>
-            <option>C# minor</option>
-            <option>G# minor</option>
-            <option>D# minor</option>
-            <option>A# minor</option>
-            <option>D minor</option>
-            <option>G minor</option>
-            <option>C minor</option>
-            <option>F minor</option>
-            <option>Bb minor</option>
-            <option>Eb minor</option>
-            <option>Ab minor</option>
+            <option>A minor</option><option>E minor</option><option>B minor</option>
+            <option>F# minor</option><option>C# minor</option><option>G# minor</option>
+            <option>D# minor</option><option>A# minor</option><option>D minor</option>
+            <option>G minor</option><option>C minor</option><option>F minor</option>
+            <option>Bb minor</option><option>Eb minor</option><option>Ab minor</option>
           </optgroup>
         </select>
       </div>
@@ -570,38 +554,18 @@
         <label for="to-key">To Key</label>
         <select id="to-key">
           <optgroup label="Major Keys">
-            <option>C major</option>
-            <option>G major</option>
-            <option>D major</option>
-            <option>A major</option>
-            <option>E major</option>
-            <option>B major</option>
-            <option>F# major</option>
-            <option>C# major</option>
-            <option>F major</option>
-            <option>Bb major</option>
-            <option>Eb major</option>
-            <option>Ab major</option>
-            <option>Db major</option>
-            <option>Gb major</option>
-            <option>Cb major</option>
+            <option>C major</option><option>G major</option><option>D major</option>
+            <option>A major</option><option>E major</option><option>B major</option>
+            <option>F# major</option><option>C# major</option><option>F major</option>
+            <option>Bb major</option><option>Eb major</option><option>Ab major</option>
+            <option>Db major</option><option>Gb major</option><option>Cb major</option>
           </optgroup>
           <optgroup label="Minor Keys">
-            <option>A minor</option>
-            <option>E minor</option>
-            <option>B minor</option>
-            <option>F# minor</option>
-            <option>C# minor</option>
-            <option>G# minor</option>
-            <option>D# minor</option>
-            <option>A# minor</option>
-            <option>D minor</option>
-            <option>G minor</option>
-            <option>C minor</option>
-            <option>F minor</option>
-            <option>Bb minor</option>
-            <option>Eb minor</option>
-            <option>Ab minor</option>
+            <option>A minor</option><option>E minor</option><option>B minor</option>
+            <option>F# minor</option><option>C# minor</option><option>G# minor</option>
+            <option>D# minor</option><option>A# minor</option><option>D minor</option>
+            <option>G minor</option><option>C minor</option><option>F minor</option>
+            <option>Bb minor</option><option>Eb minor</option><option>Ab minor</option>
           </optgroup>
         </select>
       </div>
@@ -661,7 +625,7 @@
     </div>
   </div>
 
-</div><!-- /main -->
+</div>
 
 <!-- Camera Modal -->
 <div class="modal-overlay" id="camera-modal">
@@ -678,41 +642,76 @@
 <canvas id="capture-canvas" style="display:none"></canvas>
 
 <script>
-// ─── State ───────────────────────────────────────────────────────────────────
-let imageBase64 = null;
+// ─── State ────────────────────────────────────────────────────────────────────
+let imageBase64   = null;
 let imageMimeType = 'image/jpeg';
-let cameraStream = null;
+let cameraStream  = null;
+let provider      = 'gemini'; // 'gemini' | 'claude'
 
-// ─── DOM refs ────────────────────────────────────────────────────────────────
-const apiKeyInput    = document.getElementById('api-key');
-const apiKeyError    = document.getElementById('api-key-error');
-const uploadZone     = document.getElementById('upload-zone');
-const fileInput      = document.getElementById('file-input');
+// ─── DOM refs ─────────────────────────────────────────────────────────────────
+const apiKeyInput      = document.getElementById('api-key');
+const apiKeyError      = document.getElementById('api-key-error');
+const keyLabel         = document.getElementById('key-label');
+const keyHint          = document.getElementById('key-hint');
+const keyLink          = document.getElementById('key-link');
+const uploadZone       = document.getElementById('upload-zone');
+const fileInput        = document.getElementById('file-input');
 const previewContainer = document.getElementById('preview-container');
-const previewImg     = document.getElementById('preview-img');
-const clearImgBtn    = document.getElementById('clear-img');
-const cameraBtn      = document.getElementById('camera-btn');
-const cameraModal    = document.getElementById('camera-modal');
-const cameraPreview  = document.getElementById('camera-preview');
-const cameraCancel   = document.getElementById('camera-cancel');
+const previewImg       = document.getElementById('preview-img');
+const clearImgBtn      = document.getElementById('clear-img');
+const cameraBtn        = document.getElementById('camera-btn');
+const cameraModal      = document.getElementById('camera-modal');
+const cameraPreview    = document.getElementById('camera-preview');
+const cameraCancel     = document.getElementById('camera-cancel');
 const cameraCaptureBtn = document.getElementById('camera-capture');
-const captureCanvas  = document.getElementById('capture-canvas');
-const fromKeySelect  = document.getElementById('from-key');
-const toKeySelect    = document.getElementById('to-key');
-const transposeBtn   = document.getElementById('transpose-btn');
-const statusEl       = document.getElementById('status');
-const statusText     = document.getElementById('status-text');
-const transposeError = document.getElementById('transpose-error');
-const results        = document.getElementById('results');
-const detectionInfo  = document.getElementById('detection-info');
-const originalKeyBadge   = document.getElementById('original-key-badge');
+const captureCanvas    = document.getElementById('capture-canvas');
+const fromKeySelect    = document.getElementById('from-key');
+const toKeySelect      = document.getElementById('to-key');
+const transposeBtn     = document.getElementById('transpose-btn');
+const statusEl         = document.getElementById('status');
+const statusText       = document.getElementById('status-text');
+const transposeError   = document.getElementById('transpose-error');
+const results          = document.getElementById('results');
+const detectionInfo    = document.getElementById('detection-info');
+const originalKeyBadge = document.getElementById('original-key-badge');
 const transposedKeyBadge = document.getElementById('transposed-key-badge');
-const originalThumb  = document.getElementById('original-thumb');
-const abcOutput      = document.getElementById('abc-output');
-const abcRaw         = document.getElementById('abc-raw');
-const copyBtn        = document.getElementById('copy-btn');
+const originalThumb    = document.getElementById('original-thumb');
+const abcOutput        = document.getElementById('abc-output');
+const abcRaw           = document.getElementById('abc-raw');
+const copyBtn          = document.getElementById('copy-btn');
 
-// ─── Image loading ────────────────────────────────────────────────────────────
+// ─── Provider toggle ──────────────────────────────────────────────────────────
+function selectProvider(p) {
+  provider = p;
+  document.getElementById('btn-gemini').classList.toggle('active', p === 'gemini');
+  document.getElementById('btn-claude').classList.toggle('active', p === 'claude');
+
+  if (p === 'gemini') {
+    keyLabel.textContent = 'Gemini API Key';
+    apiKeyInput.placeholder = 'AIzaSy…';
+    keyHint.innerHTML = 'Free tier — no credit card needed. Get a key in &lt;2 minutes at '
+      + '<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>. '
+      + 'Your key stays in this browser tab only.';
+    const saved = sessionStorage.getItem('gemini_key') || '';
+    apiKeyInput.value = saved;
+  } else {
+    keyLabel.textContent = 'Anthropic API Key';
+    apiKeyInput.placeholder = 'sk-ant-…';
+    keyHint.innerHTML = 'Requires a paid account. Get a key at '
+      + '<a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>. '
+      + 'Your key stays in this browser tab only.';
+    const saved = sessionStorage.getItem('claude_key') || '';
+    apiKeyInput.value = saved;
+  }
+  updateTransposeBtn();
+}
+
+function isKeyValid(key) {
+  if (provider === 'gemini') return key.startsWith('AIza') && key.length > 10;
+  return key.startsWith('sk-ant-');
+}
+
+// ─── Image loading ─────────────────────────────────────────────────────────────
 function setImage(base64, mimeType) {
   imageBase64 = base64;
   imageMimeType = mimeType;
@@ -740,11 +739,9 @@ function readFile(file) {
   reader.readAsDataURL(file);
 }
 
-fileInput.addEventListener('change', e => {
-  if (e.target.files[0]) readFile(e.target.files[0]);
-});
+fileInput.addEventListener('change', e => { if (e.target.files[0]) readFile(e.target.files[0]); });
 
-uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
 uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
 uploadZone.addEventListener('drop', e => {
   e.preventDefault();
@@ -779,16 +776,21 @@ cameraCaptureBtn.addEventListener('click', () => {
   captureCanvas.height = h;
   captureCanvas.getContext('2d').drawImage(cameraPreview, 0, 0, w, h);
   const dataUrl = captureCanvas.toDataURL('image/jpeg', 0.92);
-  const b64 = dataUrl.split(',')[1];
-  setImage(b64, 'image/jpeg');
+  setImage(dataUrl.split(',')[1], 'image/jpeg');
   stopCamera();
 });
 
 // ─── Transpose button state ───────────────────────────────────────────────────
 function updateTransposeBtn() {
-  transposeBtn.disabled = !(imageBase64 && apiKeyInput.value.trim().startsWith('sk-ant-'));
+  transposeBtn.disabled = !(imageBase64 && isKeyValid(apiKeyInput.value.trim()));
 }
-apiKeyInput.addEventListener('input', updateTransposeBtn);
+
+apiKeyInput.addEventListener('input', () => {
+  const val = apiKeyInput.value.trim();
+  if (provider === 'gemini' && val.startsWith('AIza')) sessionStorage.setItem('gemini_key', val);
+  if (provider === 'claude' && val.startsWith('sk-ant-')) sessionStorage.setItem('claude_key', val);
+  updateTransposeBtn();
+});
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function showError(el, msg) { el.textContent = msg; el.classList.add('visible'); }
@@ -796,39 +798,21 @@ function hideError(el) { el.textContent = ''; el.classList.remove('visible'); }
 function setStatus(msg) { statusText.textContent = msg; statusEl.classList.add('visible'); }
 function hideStatus() { statusEl.classList.remove('visible'); }
 
-// Map friendly key names to ABC notation K: field values
 const keyToAbc = {
-  'C major': 'C', 'G major': 'G', 'D major': 'D', 'A major': 'A',
-  'E major': 'E', 'B major': 'B', 'F# major': 'F#', 'C# major': 'C#',
-  'F major': 'F', 'Bb major': 'Bb', 'Eb major': 'Eb', 'Ab major': 'Ab',
-  'Db major': 'Db', 'Gb major': 'Gb', 'Cb major': 'Cb',
-  'A minor': 'Am', 'E minor': 'Em', 'B minor': 'Bm', 'F# minor': 'F#m',
-  'C# minor': 'C#m', 'G# minor': 'G#m', 'D# minor': 'D#m', 'A# minor': 'A#m',
-  'D minor': 'Dm', 'G minor': 'Gm', 'C minor': 'Cm', 'F minor': 'Fm',
-  'Bb minor': 'Bbm', 'Eb minor': 'Ebm', 'Ab minor': 'Abm'
+  'C major':'C','G major':'G','D major':'D','A major':'A','E major':'E','B major':'B',
+  'F# major':'F#','C# major':'C#','F major':'F','Bb major':'Bb','Eb major':'Eb',
+  'Ab major':'Ab','Db major':'Db','Gb major':'Gb','Cb major':'Cb',
+  'A minor':'Am','E minor':'Em','B minor':'Bm','F# minor':'F#m','C# minor':'C#m',
+  'G# minor':'G#m','D# minor':'D#m','A# minor':'A#m','D minor':'Dm','G minor':'Gm',
+  'C minor':'Cm','F minor':'Fm','Bb minor':'Bbm','Eb minor':'Ebm','Ab minor':'Abm'
 };
 
-// ─── Transpose ────────────────────────────────────────────────────────────────
-transposeBtn.addEventListener('click', async () => {
-  hideError(transposeError);
-  hideError(apiKeyError);
-
-  const apiKey = apiKeyInput.value.trim();
-  if (!apiKey.startsWith('sk-ant-')) {
-    showError(apiKeyError, 'Please enter a valid Anthropic API key (starts with sk-ant-).');
-    return;
-  }
-  if (!imageBase64) { return; }
-
-  const fromKey = fromKeySelect.value;
-  const toKey   = toKeySelect.value;
-  const toKeyAbc = keyToAbc[toKey] || 'C';
-
+function buildPrompt(fromKey, toKey, toKeyAbc) {
   const fromInstruction = fromKey === 'auto'
     ? 'Identify the key signature from the sheet music.'
     : `The source key is ${fromKey}.`;
 
-  const prompt = `You are an expert music transcriptionist with deep knowledge of music theory and ABC notation.
+  return `You are an expert music transcriptionist with deep knowledge of music theory and ABC notation.
 
 Analyze this sheet music image and perform the following tasks:
 
@@ -848,98 +832,135 @@ ABC notation format rules:
 - Start with X:1 on its own line
 - Include T: (title), M: (time signature), L: (default note length), Q: (tempo if known), K: (the TARGET key ${toKeyAbc})
 - Separate measures with | and end lines with |
-- Use standard ABC pitch notation (uppercase = below middle octave, lowercase = above; ' for octave up, , for octave down)
+- Use standard ABC pitch notation (uppercase = below middle octave, lowercase = above)
 - Include chord symbols with "..." if visible
 - Include bar lines, double bars, repeat signs
 - Be thorough — transcribe every measure you can see
 
 IMPORTANT: Return ONLY valid JSON, no markdown code fences, no explanation text.`;
+}
+
+// ─── API calls ────────────────────────────────────────────────────────────────
+async function callGemini(apiKey, prompt) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{
+        parts: [
+          { inline_data: { mime_type: imageMimeType, data: imageBase64 } },
+          { text: prompt }
+        ]
+      }],
+      generationConfig: { maxOutputTokens: 4096 }
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Gemini API error ${res.status}`);
+  }
+
+  const data = await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
+async function callClaude(apiKey, prompt) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4096,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: imageMimeType, data: imageBase64 } },
+          { type: 'text', text: prompt }
+        ]
+      }]
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Claude API error ${res.status}`);
+  }
+
+  const data = await res.json();
+  return data.content?.[0]?.text || '';
+}
+
+function parseResponse(raw) {
+  let cleaned = raw.trim().replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (match) return JSON.parse(match[0]);
+    throw new Error('Could not parse AI response as JSON. Try again with a clearer image.');
+  }
+}
+
+// ─── Transpose ────────────────────────────────────────────────────────────────
+transposeBtn.addEventListener('click', async () => {
+  hideError(transposeError);
+  hideError(apiKeyError);
+
+  const apiKey = apiKeyInput.value.trim();
+  if (!isKeyValid(apiKey)) {
+    showError(apiKeyError, provider === 'gemini'
+      ? 'Please enter a valid Gemini API key (starts with AIzaSy).'
+      : 'Please enter a valid Anthropic API key (starts with sk-ant-).');
+    return;
+  }
+  if (!imageBase64) return;
+
+  const fromKey   = fromKeySelect.value;
+  const toKey     = toKeySelect.value;
+  const toKeyAbc  = keyToAbc[toKey] || 'C';
+  const prompt    = buildPrompt(fromKey, toKey, toKeyAbc);
 
   transposeBtn.disabled = true;
-  setStatus('Sending image to Claude API…');
   results.classList.remove('visible');
   detectionInfo.classList.remove('visible');
+  setStatus('Sending image to AI…');
 
   try {
-    setStatus('Analyzing sheet music and transposing…');
-
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 4096,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: {
-                type: 'base64',
-                media_type: imageMimeType,
-                data: imageBase64
-              }
-            },
-            { type: 'text', text: prompt }
-          ]
-        }]
-      })
-    });
-
-    if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      const msg = errData.error?.message || `HTTP ${response.status}`;
-      throw new Error(msg);
-    }
+    setStatus('Analyzing and transposing…');
+    const raw = provider === 'gemini'
+      ? await callGemini(apiKey, prompt)
+      : await callClaude(apiKey, prompt);
 
     setStatus('Processing response…');
-    const data = await response.json();
-    const raw = data.content?.[0]?.text || '';
-
-    // Parse JSON — strip markdown fences if present
-    let cleaned = raw.trim().replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
-    let parsed;
-    try {
-      parsed = JSON.parse(cleaned);
-    } catch {
-      // Try to extract JSON from the response
-      const match = cleaned.match(/\{[\s\S]*\}/);
-      if (match) { parsed = JSON.parse(match[0]); }
-      else { throw new Error('Could not parse AI response as JSON. The model may have returned an unexpected format.'); }
-    }
+    const parsed = parseResponse(raw);
 
     const abcStr = parsed.abc_notation || '';
-    if (!abcStr.trim()) { throw new Error('The AI did not return any ABC notation. Try with a clearer image.'); }
+    if (!abcStr.trim()) throw new Error('The AI did not return any ABC notation. Try with a clearer image.');
 
-    // Show detection info
     if (parsed.detected_key) {
-      detectionInfo.textContent = `Detected: ${parsed.detected_key}${parsed.title && parsed.title !== 'Unknown' ? ' · "' + parsed.title + '"' : ''}${parsed.measures_count ? ' · ' + parsed.measures_count + ' measures' : ''}`;
+      detectionInfo.textContent = `Detected: ${parsed.detected_key}`
+        + (parsed.title && parsed.title !== 'Unknown' ? ` · "${parsed.title}"` : '')
+        + (parsed.measures_count ? ` · ${parsed.measures_count} measures` : '');
       detectionInfo.classList.add('visible');
     }
 
-    // Render
-    originalKeyBadge.textContent   = parsed.detected_key || (fromKey === 'auto' ? '?' : fromKey);
-    transposedKeyBadge.textContent  = toKey;
+    originalKeyBadge.textContent  = parsed.detected_key || (fromKey === 'auto' ? '?' : fromKey);
+    transposedKeyBadge.textContent = toKey;
     originalThumb.src = `data:${imageMimeType};base64,${imageBase64}`;
     abcRaw.textContent = abcStr;
 
-    // Render ABC notation
     abcOutput.innerHTML = '';
     try {
-      ABCJS.renderAbc(abcOutput, abcStr, {
-        responsive: 'resize',
-        staffwidth: 400,
-        scale: 0.95,
-        paddingright: 0,
-        paddingtop: 10
-      });
+      ABCJS.renderAbc(abcOutput, abcStr, { responsive: 'resize', staffwidth: 400, scale: 0.95, paddingright: 0, paddingtop: 10 });
     } catch (renderErr) {
-      abcOutput.innerHTML = `<p style="color:#f87171;font-size:0.85rem">Render error: ${renderErr.message}<br><br>ABC text shown below.</p>`;
+      abcOutput.innerHTML = `<p style="color:#f87171;font-size:0.85rem">Render error: ${renderErr.message}<br>ABC text shown below.</p>`;
     }
 
     results.classList.add('visible');
@@ -954,27 +975,19 @@ IMPORTANT: Return ONLY valid JSON, no markdown code fences, no explanation text.
   }
 });
 
-// ─── Copy button ──────────────────────────────────────────────────────────────
+// ─── Copy ─────────────────────────────────────────────────────────────────────
 copyBtn.addEventListener('click', async () => {
-  const text = abcRaw.textContent;
   try {
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(abcRaw.textContent);
     copyBtn.textContent = 'Copied!';
-    setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
   } catch {
     copyBtn.textContent = 'Failed';
-    setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
   }
+  setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
 });
 
-// ─── Restore API key from sessionStorage ─────────────────────────────────────
-const savedKey = sessionStorage.getItem('anthropic_key');
-if (savedKey) { apiKeyInput.value = savedKey; updateTransposeBtn(); }
-apiKeyInput.addEventListener('input', () => {
-  if (apiKeyInput.value.startsWith('sk-ant-')) {
-    sessionStorage.setItem('anthropic_key', apiKeyInput.value);
-  }
-});
+// ─── Init ─────────────────────────────────────────────────────────────────────
+selectProvider('gemini');
 </script>
 </body>
 </html>
