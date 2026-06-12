@@ -583,6 +583,7 @@
         <span id="status-text">Analyzing sheet music…</span>
       </div>
     </div>
+    <p id="ready-hint" style="font-size:0.8rem;color:var(--muted);margin-top:10px;"></p>
     <div class="alert alert-error" id="transpose-error"></div>
   </div>
 
@@ -707,8 +708,8 @@ function selectProvider(p) {
 }
 
 function isKeyValid(key) {
-  if (provider === 'gemini') return key.startsWith('AIza') && key.length > 10;
-  return key.startsWith('sk-ant-');
+  if (provider === 'gemini') return key.length >= 20;
+  return key.startsWith('sk-ant-') && key.length > 20;
 }
 
 // ─── Image loading ─────────────────────────────────────────────────────────────
@@ -782,15 +783,30 @@ cameraCaptureBtn.addEventListener('click', () => {
 
 // ─── Transpose button state ───────────────────────────────────────────────────
 function updateTransposeBtn() {
-  transposeBtn.disabled = !(imageBase64 && isKeyValid(apiKeyInput.value.trim()));
+  const hasKey   = isKeyValid(apiKeyInput.value.trim());
+  const hasImage = !!imageBase64;
+  transposeBtn.disabled = !(hasKey && hasImage);
+
+  const hint = document.getElementById('ready-hint');
+  if (hasKey && hasImage) {
+    hint.textContent = '';
+  } else {
+    const missing = [];
+    if (!hasKey)   missing.push('an API key');
+    if (!hasImage) missing.push('a sheet music image');
+    hint.textContent = 'Still needed: ' + missing.join(' and ');
+  }
 }
 
-apiKeyInput.addEventListener('input', () => {
+function onKeyChange() {
   const val = apiKeyInput.value.trim();
-  if (provider === 'gemini' && val.startsWith('AIza')) sessionStorage.setItem('gemini_key', val);
+  if (provider === 'gemini' && val.length >= 20) sessionStorage.setItem('gemini_key', val);
   if (provider === 'claude' && val.startsWith('sk-ant-')) sessionStorage.setItem('claude_key', val);
   updateTransposeBtn();
-});
+}
+apiKeyInput.addEventListener('input',  onKeyChange);
+apiKeyInput.addEventListener('change', onKeyChange);
+apiKeyInput.addEventListener('paste',  () => setTimeout(onKeyChange, 50));
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function showError(el, msg) { el.textContent = msg; el.classList.add('visible'); }
